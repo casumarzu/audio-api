@@ -1,0 +1,5 @@
+export {
+  test: {
+    testData: 'hello'
+  }
+}

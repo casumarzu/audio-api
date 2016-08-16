@@ -1,0 +1,7 @@
+node_modules
+/dist
+/prod
+.tmp
+.sass-cache
+.idea
+npm-debug.log
