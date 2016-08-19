@@ -17,7 +17,7 @@ if(NODE_ENV === 'development') {
 
 var entry = {
   common: preEntry.concat([path.join(__dirname, '..', '/src/scripts', 'index.js')]),
-  // alpha: preEntry.concat([path.join(__dirname, '..', '/src/scripts', 'alpha.js')]),
+  audio: preEntry.concat([path.join(__dirname, '..', '/src/scripts', 'audio.js')]),
   // beta: preEntry.concat([path.join(__dirname, '..', '/src/scripts', 'beta.js')])
 };
 

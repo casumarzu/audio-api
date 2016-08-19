@@ -1,0 +1,43 @@
+
+html {
+  height: 100%;
+}
+
+body {
+  height: 100%;
+}
+
+#root {
+  height: 100%;
+  div > {
+    height: 100%;
+  }
+}
+canvas {
+  display: inline-block;
+  background: #282b22;
+  size: 100%;
+  box-sizing: border-box;
+  border: 10px solid #8a425d;
+}
+
+#viz, #controls {
+  float: left;
+  size: 50% 100%;
+}
+
+#record.recording {
+  background: red;
+}
+
+#save {
+  display: none;
+}
+#save[download] {
+  display: block;
+}
+#controls {
+  button {
+    margin: 10px;
+  }
+}

@@ -1,4 +1,13 @@
 import * as colors from 'material-ui/styles/colors'
+
+import firebase from 'firebase/app'
+import 'firebase/auth'
+import 'firebase/database'
+
+const config = {}
+
+firebase.initializeApp(config)
+
 export const muiStyle = {
   fontFamily: 'Roboto, sans-serif',
   palette: {

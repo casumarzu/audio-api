@@ -6,6 +6,9 @@ import DevTools from 'Containers/DevTools'
 import { getMuiTheme, MuiThemeProvider } from 'material-ui/styles'
 import { muiStyle } from 'Scripts/config'
 
+import Header from 'Layout/Header'
+import Footer from 'Layout/Footer'
+
 const muiTheme = getMuiTheme(muiStyle)
 
 export default class App extends Component {
@@ -20,9 +23,11 @@ export default class App extends Component {
     return (
       <MuiThemeProvider muiTheme={muiTheme}>
         <div>
-          <div>
+          <Header />
+          <content>
             {this.props.children}
-          </div>
+          </content>
+          <Footer />
           {DevToolsNode}
         </div>
       </MuiThemeProvider>

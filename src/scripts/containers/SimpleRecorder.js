@@ -1,5 +1,6 @@
 import React, { Component, PropTypes } from 'react'
 import { Router, Route, Link, browserHistory } from 'react-router'
+import {cancelAnalyserUpdates} from 'Util/audio/main'
 import * as mui from 'material-ui'
 
 navigator.getUserMedia = (
@@ -17,17 +18,17 @@ const audioStyle = {
 const hasGetUserMedia = () => !!(navigator.getUserMedia)
 
 
-export default class App extends Component {
+export default class SimpleRecorder extends Component {
   componentWillMount() {
     this.recorder()
     this.state = {
       audioList: []
     }
+    cancelAnalyserUpdates()
   }
 
   visualize(event) {
     const stream = event
-    console.log(stream) // eslint-disable-line no-console
   }
 
   record() {
@@ -79,7 +80,6 @@ export default class App extends Component {
 
   recorder() {
     if (navigator.getUserMedia) {
-      console.log('getUserMedia supported.') // eslint-disable-line no-console
       let constraints = { audio: true }
       this.chunks = []
       navigator.getUserMedia(constraints, ::this.onSuccess, ::this.onError)
@@ -98,9 +98,7 @@ export default class App extends Component {
     link.dispatchEvent(click)
   }
 
-  downloadHandle() {
-
-  }
+  downloadHandle() {}
 
   render() {
     const mediaSupport = hasGetUserMedia()
@@ -115,14 +113,13 @@ export default class App extends Component {
         <div>
           {
             this.state.audioList.map(
-              audio => {
+              (audio, i) => {
                 const {name, blob, src} = audio
                 const downloadHandle = () => {
                   this.download(blob, name)
                 }
                 return (
-                  <p>{name}: <audio
-                    autoplay="true"
+                  <p key={i}>{name}: <audio
                     style={audioStyle}
                     preload
                     controls>

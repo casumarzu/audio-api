@@ -43,7 +43,7 @@ var config = {
       Containers: path.resolve( __dirname, 'src', 'scripts', 'containers' ),
       Components: path.resolve( __dirname, 'src', 'scripts', 'components' ),
 
-      Layout: path.resolve( __dirname, 'src', 'scripts', 'loyouts' ),
+      Layout: path.resolve( __dirname, 'src', 'scripts', 'layouts' ),
       Page: path.resolve( __dirname, 'src', 'scripts', 'pages' ),
 
       Util: path.resolve( __dirname, 'src', 'scripts', 'utils' ),

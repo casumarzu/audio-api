@@ -12,10 +12,17 @@ if(NODE_ENV === 'development'){
   plugins = [
     new HtmlPlugin({
       filename: 'index.html',
-      title: 'Dev Test',
+      title: 'Dev Audio',
       favicon: path.join(__dirname, '..', '/src', 'favicon.ico'),
       template: path.join(__dirname, '..', '/src', '/templates/index.html'),
       chunks: ['common', 'vendors']
+    }),
+    new HtmlPlugin({
+      filename: 'audio.html',
+      title: 'Dev Audio',
+      favicon: path.join(__dirname, '..', '/src', 'favicon.ico'),
+      template: path.join(__dirname, '..', '/src', '/templates/audio.html'),
+      chunks: ['audio', 'vendors']
     }),
     // new NpmInstallPlugin(),
     new ExtractTextPlugin(),
@@ -44,6 +51,13 @@ if(NODE_ENV === 'development'){
       favicon: path.join(__dirname, '..', '/src', 'favicon.ico'),
       template: path.join(__dirname, '..', '/src', '/templates/index.html'),
       chunks: ['common', 'vendors'],
+    }),
+    new HtmlPlugin({
+      filename: 'audio.html',
+      title: 'Audio',
+      favicon: path.join(__dirname, '..', '/src', 'favicon.ico'),
+      template: path.join(__dirname, '..', '/src', '/templates/audio.html'),
+      chunks: ['audio', 'vendors']
     }),
     new CommonsChunkPlugin('vendors', 'vendors.[hash].js'),
     new ExtractTextPlugin('bundle.[hash].css', { allChunks: true }),
