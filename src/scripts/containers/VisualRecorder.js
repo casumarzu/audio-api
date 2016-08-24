@@ -55,6 +55,7 @@ export default class VisualRecorder extends Component {
     const {target} = e
     if (recording) {
       // stop recording
+      this.stopTimer()
       audioRecorder.stop()
       target.classList.remove('recording')
       recording = false
@@ -62,6 +63,7 @@ export default class VisualRecorder extends Component {
     } else {
       // start recording
       if (!audioRecorder) return
+      this.startTimer()
       target.classList.add('recording')
       recording = true
       audioRecorder.clear()
@@ -194,22 +196,23 @@ export default class VisualRecorder extends Component {
 
   stopTimer() {
     clearTimeout(this.timer)
+    this.setState({timer: 0})
   }
 
   render() {
     const {audioList, timer} = this.state
+    const timerNode = (timer > 0) ? (<span>Timer: {timer}</span>) : null
     return (
       <div>
         <div id="viz">
           <canvas id="analyser" width="1024" height="500"></canvas>
-          {/*<canvas id="wavedisplay" width="1024" height="500"></canvas>*/}
         </div>
-        <div id="controls">
-          <button id="record" onClick={::this.toggleRecording}>Record</button>
-          {/*<span>Timer: {timer}</span>*/}
-          {/*<a id="save" href="#">
-            <button>Save</button>
-          </a>*/}
+        <div className="controls">
+          <button
+            id="record"
+            className="controls__button"
+            onClick={::this.toggleRecording}>Record</button>
+          {timerNode}
         </div>
         <div className="player">
           {
@@ -223,10 +226,14 @@ export default class VisualRecorder extends Component {
               return (
                 <div className="audioItem" key={i}>
                   <p>Название: {name}</p>
-                  <audio style={audioStyle} src={src} controls></audio><br/>
-                  <a download={name} href={src}>Загрузить</a><br/>
-                  <button>Отправить на сервер</button><br/>
-                  <canvas width="1024" height="500" id={id}></canvas>
+                  <div>
+                    <audio style={audioStyle} src={src} controls></audio>
+                    <canvas width="1024" height="500" id={id}></canvas>
+                  </div>
+                  <div className="controls">
+                    <a className="controls__button" download={name} href={src}>Загрузить</a>
+                    <button className="controls__button">Отправить на сервер</button>
+                  </div>
                 </div>
               )
             } )
