@@ -1,145 +1,123 @@
-
-let recLength = 0,
-  recBuffersL = [],
-  recBuffersR = [],
-  sampleRate
-
-onmessage = function(e){
-  switch(e.data.command){
-    case 'init':
-      init(e.data.config)
-      break
-    case 'record':
-      record(e.data.buffer)
-      break
-    case 'exportWAV':
-      exportWAV(e.data.type)
-      break
-    case 'exportMonoWAV':
-      exportMonoWAV(e.data.type)
-      break
-    case 'getBuffers':
-      getBuffers()
-      break
-    case 'clear':
-      clear()
-      break
-    default:
-      break
+export default class RecorderWorker {
+  constructor(config, postMessage) {
+    this.recLength = 0
+    this.recBuffersL = []
+    this.recBuffersR = []
+    this.sampleRate = null
+    this.postMessage = postMessage
+    this.sampleRate = config.sampleRate
   }
-}
 
-function init(config){
-  sampleRate = config.sampleRate
-}
-
-function record(inputBuffer){
-  recBuffersL.push(inputBuffer[0])
-  recBuffersR.push(inputBuffer[1])
-  recLength += inputBuffer[0].length
-}
-
-function exportWAV(type){
-  let bufferL = mergeBuffers(recBuffersL, recLength)
-  let bufferR = mergeBuffers(recBuffersR, recLength)
-  let interleaved = interleave(bufferL, bufferR)
-  let dataview = encodeWAV(interleaved)
-  let audioBlob = new Blob([dataview], { type: type })
-
-  postMessage(audioBlob)
-}
-
-function exportMonoWAV(type){
-  let bufferL = mergeBuffers(recBuffersL, recLength)
-  let dataview = encodeWAV(bufferL, true)
-  let audioBlob = new Blob([dataview], { type: type })
-
-  postMessage(audioBlob)
-}
-
-function getBuffers() {
-  let buffers = []
-  buffers.push( mergeBuffers(recBuffersL, recLength) )
-  buffers.push( mergeBuffers(recBuffersR, recLength) )
-  postMessage(buffers)
-}
-
-function clear(){
-  recLength = 0
-  recBuffersL = []
-  recBuffersR = []
-}
-
-function mergeBuffers(recBuffers, recLength){
-  let result = new Float32Array(recLength)
-  let offset = 0
-  for (let i = 0; i < recBuffers.length; i++){
-    result.set(recBuffers[i], offset)
-    offset += recBuffers[i].length
+  init(config) {
+    this.sampleRate = config.sampleRate
   }
-  return result
-}
 
-function interleave(inputL, inputR){
-  let length = inputL.length + inputR.length
-  let result = new Float32Array(length)
-
-  let index = 0,
-    inputIndex = 0
-
-  while (index < length){
-    result[index++] = inputL[inputIndex]
-    result[index++] = inputR[inputIndex]
-    inputIndex++
+  record(inputBuffer) {
+    this.recBuffersL.push(inputBuffer[0])
+    this.recBuffersR.push(inputBuffer[1])
+    this.recLength += inputBuffer[0].length
   }
-  return result
-}
 
-function floatTo16BitPCM(output, offset, input){
-  for (let i = 0; i < input.length; i++, offset+=2){
-    let s = Math.max(-1, Math.min(1, input[i]))
-    output.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7FFF, true)
+  exportWAV(type) {
+    const bufferL = this.mergeBuffers(this.recBuffersL, this.recLength)
+    const bufferR = this.mergeBuffers(this.recBuffersR, this.recLength)
+    const interleaved = this.interleave(bufferL, bufferR)
+    const dataview = this.encodeWAV(interleaved)
+    const audioBlob = new Blob([dataview], { type })
+    this.postMessage(audioBlob)
   }
-}
 
-function writeString(view, offset, string){
-  for (let i = 0; i < string.length; i++){
-    view.setUint8(offset + i, string.charCodeAt(i))
+  exportMonoWAV(type) {
+    const bufferL = this.mergeBuffers(recBuffersL, recLength)
+    const dataview = this.encodeWAV(bufferL, true)
+    const audioBlob = new Blob([dataview], { type: type })
+    this.postMessage(audioBlob)
   }
-}
 
-function encodeWAV(samples, mono){
-  let buffer = new ArrayBuffer(44 + samples.length * 2)
-  let view = new DataView(buffer)
+  getBuffers() {
+    let buffers = []
+    buffers.push( this.mergeBuffers(this.recBuffersL, this.recLength) )
+    buffers.push( this.mergeBuffers(this.recBuffersR, this.recLength) )
+    this.postMessage(buffers)
+  }
 
-  /* RIFF identifier */
-  writeString(view, 0, 'RIFF')
-  /* file length */
-  view.setUint32(4, 32 + samples.length * 2, true)
-  /* RIFF type */
-  writeString(view, 8, 'WAVE')
-  /* format chunk identifier */
-  writeString(view, 12, 'fmt ')
-  /* format chunk length */
-  view.setUint32(16, 16, true)
-  /* sample format (raw) */
-  view.setUint16(20, 1, true)
-  /* channel count */
-  view.setUint16(22, mono?1:2, true)
-  /* sample rate */
-  view.setUint32(24, sampleRate, true)
-  /* byte rate (sample rate * block align) */
-  view.setUint32(28, sampleRate * 4, true)
-  /* block align (channel count * bytes per sample) */
-  view.setUint16(32, 4, true)
-  /* bits per sample */
-  view.setUint16(34, 16, true)
-  /* data chunk identifier */
-  writeString(view, 36, 'data')
-  /* data chunk length */
-  view.setUint32(40, samples.length * 2, true)
+  clear(){
+    this.recLength = 0
+    this.recBuffersL = []
+    this.recBuffersR = []
+  }
 
-  floatTo16BitPCM(view, 44, samples)
+  mergeBuffers(recBuffers, recLength) {
+    let result = new Float32Array(recLength)
+    let offset = 0
+    for (let i = 0; i < recBuffers.length; i++){
+      result.set(recBuffers[i], offset)
+      offset += recBuffers[i].length
+    }
+    return result
+  }
 
-  return view
+  interleave(inputL, inputR) {
+    let length = inputL.length + inputR.length
+    let result = new Float32Array(length)
+
+    let index = 0,
+      inputIndex = 0
+
+    while (index < length){
+      result[index++] = inputL[inputIndex]
+      result[index++] = inputR[inputIndex]
+      inputIndex++
+    }
+    return result
+  }
+
+  floatTo16BitPCM(output, offset, input) {
+    for (let i = 0; i < input.length; i++, offset+=2){
+      let s = Math.max(-1, Math.min(1, input[i]))
+      output.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7FFF, true)
+    }
+  }
+
+  writeString(view, offset, string) {
+    for (let i = 0; i < string.length; i++){
+      view.setUint8(offset + i, string.charCodeAt(i))
+    }
+  }
+
+  encodeWAV(samples, mono){
+    let buffer = new ArrayBuffer(44 + samples.length * 2)
+    let view = new DataView(buffer)
+
+    /* RIFF identifier */
+    this.writeString(view, 0, 'RIFF')
+    /* file length */
+    view.setUint32(4, 32 + samples.length * 2, true)
+    /* RIFF type */
+    this.writeString(view, 8, 'WAVE')
+    /* format chunk identifier */
+    this.writeString(view, 12, 'fmt ')
+    /* format chunk length */
+    view.setUint32(16, 16, true)
+    /* sample format (raw) */
+    view.setUint16(20, 1, true)
+    /* channel count */
+    view.setUint16(22, mono?1:2, true)
+    /* sample rate */
+    view.setUint32(24, this.sampleRate, true)
+    /* byte rate (sample rate * block align) */
+    view.setUint32(28, this.sampleRate * 4, true)
+    /* block align (channel count * bytes per sample) */
+    view.setUint16(32, 4, true)
+    /* bits per sample */
+    view.setUint16(34, 16, true)
+    /* data chunk identifier */
+    this.writeString(view, 36, 'data')
+    /* data chunk length */
+    view.setUint32(40, samples.length * 2, true)
+
+    this.floatTo16BitPCM(view, 44, samples)
+
+    return view
+  }
 }

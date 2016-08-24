@@ -13,17 +13,26 @@ body {
     height: 100%;
   }
 }
+
+.audioItem {
+
+}
+
 canvas {
   display: inline-block;
   background: #282b22;
-  size: 100%;
+  size: 25% 50%;
   box-sizing: border-box;
   border: 10px solid #8a425d;
+
+  // $ratio: 0.5;
+  // width: 1024px * $ratio;
+  // height: 500px * $ratio;
 }
 
 #viz, #controls {
   float: left;
-  size: 50% 100%;
+  size: 100%;
 }
 
 #record.recording {

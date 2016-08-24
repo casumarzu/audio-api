@@ -8,7 +8,7 @@
     "clean": "rimraf dist",
     "start": "npm run dev",
     "dev": "NODE_ENV=development babel-node devServer",
-    "build": "NODE_ENV=production webpack",
+    "build": "NODE_ENV=production webpack --config webpack.config.babel.js",
     "prod": "npm run clean && npm run build"
   },
   "repository": {
@@ -113,6 +113,7 @@
     "react": "^15.2.1",
     "react-addons-css-transition-group": "^15.2.1",
     "react-animate.css": "0.0.4",
+    "react-d3": "^0.4.0",
     "react-dom": "^15.2.1",
     "react-event-listener": "^0.2.1",
     "react-filter": "0.0.7",

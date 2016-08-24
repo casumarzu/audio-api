@@ -1,5 +1,5 @@
 import webpack from 'webpack'
-import config from './webpack.config'
+import config from './webpack.config.babel'
 import WebpackDevServer from 'webpack-dev-server'
 const port = 8080
 

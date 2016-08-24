@@ -1,15 +1,13 @@
-var NODE_ENV = process.env.NODE_ENV;
 
-var path = require('path'),
-    webpack = require('webpack');
+import path from 'path'
+import webpack from 'webpack'
+import ExtractTextPlugin from 'extract-text-webpack-plugin'
 
+const NODE_ENV = process.env.NODE_ENV
+const include = path.join(__dirname, '..', '/src')
+const exclude = /(node_modules)/
 
-var ExtractTextPlugin = require('extract-text-webpack-plugin');
-
-var include = path.join(__dirname, '..', '/src'),
-    exclude = /(node_modules)/;
-
-var imageLoader = {
+const imageLoader = {
   test: /.jpe?g$|.gif$|.png$|.svg$/,
   loaders: [
     'file-loader?hash=sha512&digest=hex&name=[name].[hash].[ext]',
@@ -17,30 +15,23 @@ var imageLoader = {
   ]
 }
 
-var jsLoader = function (loader, lang) {
+const jsLoader = (loader, lang) => {
   var loaders = [loader];
 
-  if(NODE_ENV === 'development') loaders = ['react-hot', loader];
+  if(NODE_ENV === 'development') loaders = ['react-hot', loader]
 
   return {
-    test: lang,
-    loaders: loaders,
-    include: include,
-    exculde: exclude
-  };
+    test: lang, loaders, include, exclude
+  }
 }
 
-var fileLoader = function (loader, lang) {
-
+const fileLoader = (loader, lang) => {
   return {
-    test: lang,
-    loader: loader,
-    include: include,
-    exculde: exclude
-  };
+    test: lang, loader, include, exclude
+  }
 }
 
-var styleLoader = function (loader, lang) {
+const styleLoader = (loader, lang) => {
   if(NODE_ENV === 'development'){
     loader = 'style-loader' + loader;
   }else if(NODE_ENV === 'production'){
@@ -48,29 +39,28 @@ var styleLoader = function (loader, lang) {
   }
 
   return {
-    test: lang,
-    loader: loader
-  };
+    test: lang, loader
+  }
 }
 
-var babelLoader   = jsLoader('babel-loader', /\.js?$|\.jsx?$/);
-var coffeeLoader  = jsLoader('coffee-jsx-loader', /\.coffee?$/);
-var tsLoader      = jsLoader('ts-loader!ts-jsx-loader', /\.ts?$/);
+const babelLoader   = jsLoader('babel-loader', /\.js?$|\.jsx?$/)
+const coffeeLoader  = jsLoader('coffee-jsx-loader', /\.coffee?$/)
+const tsLoader      = jsLoader('ts-loader!ts-jsx-loader', /\.ts?$/)
 
-var jadeLoader = fileLoader('pug', /\.jade?$/);
+const jadeLoader = fileLoader('pug', /\.jade?$/)
 
 // var css = '!css-loader?modules&sourceMap&importLoaders=1&localIdentName=[local]___[hash:base64:10]!postcss-loader';
-var css = '!css-loader?modules&sourceMap&importLoaders=1&localIdentName=[local]!postcss-loader';
+const css = '!css-loader?modules&sourceMap&importLoaders=1&localIdentName=[local]!postcss-loader'
 
-var cssLoader  = styleLoader(css, /\.css?$/);
-var stylLoader = styleLoader(css + '!stylus-loader', /\.styl?$/);
-var scssLoader = styleLoader(css + '!sass-loader', /\.scss$|\.sass$/);
-var lessLoader = styleLoader(css + '!less-loader', /\.less?$/);
-var urlLoader = { test: /.(png|woff(2)?|eot|ttf|svg)(\?[a-z0-9=\.]+)?$/, loader: 'url-loader?limit=100000' };
-var fontLoader = { test: /\.(eot|svg|ttf|woff|woff2)$/, loader: 'file?name=fonts/[name].[ext]' };
+const cssLoader  = styleLoader(css, /\.css?$/);
+const stylLoader = styleLoader(css + '!stylus-loader', /\.styl?$/)
+const scssLoader = styleLoader(css + '!sass-loader', /\.scss$|\.sass$/)
+const lessLoader = styleLoader(css + '!less-loader', /\.less?$/)
+const urlLoader = { test: /.(png|woff(2)?|eot|ttf|svg)(\?[a-z0-9=\.]+)?$/, loader: 'url-loader?limit=100000' }
+const fontLoader = { test: /\.(eot|svg|ttf|woff|woff2)$/, loader: 'file?name=fonts/[name].[ext]' }
 
 
-var loaders = [
+const loaders = [
   jadeLoader,
   babelLoader,
   coffeeLoader,
@@ -83,4 +73,4 @@ var loaders = [
   fontLoader
 ];
 
-module.exports = loaders;
+export default loaders
